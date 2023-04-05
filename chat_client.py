@@ -30,7 +30,7 @@ class ChatClient:
             chat_sock.connect((self.chat_host, self.chat_port))
             print("Connected to socket")
         except OSError as e:
-            print("Unable to connect to socket: ")
+            print("Unable to connect to socket: ",e)
             if chat_sock:
                 chat_sock.close()
             sys.exit(1)
@@ -67,7 +67,7 @@ class ChatClient:
             print(msg)
 
             packet = self.make_pkt(self.chat_host, msg).encode('utf-8')
-            sock.sendall(packet)
+            sock.sendall(packet)    
         
 
     def read_sock(self, sock):
@@ -85,15 +85,19 @@ class ChatClient:
 
         while True:
             # receive set size length
-            length = int(sock.recv(4).decode('utf-8'), 16)
+            length = sock.recv(4).decode('utf-8')
+            if length == '':
+                pass
+            else:
+                length = int(length,16)
+                # receive given length of source and payload minus length
+                source_and_payload = sock.recv(length).decode('utf-8')
+                
+                # Separate into values
+                spl = source_and_payload.split("//")
+                if source_and_payload:
+                    print('\u001b[1F' + '\n' + spl[1] + '\n' + self.name, end = '')
             
-            # receive given length of source and payload minus length
-            source_and_payload = sock.recv(length).decode('utf-8')
-            
-            # Separate into values
-            spl = source_and_payload.split("//")
-            if source_and_payload:
-                print('\u001b[1F' + '\n' + spl[1] + '\n' + self.name, end = '')
 
 def main():
 
