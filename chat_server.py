@@ -72,12 +72,17 @@ class ChatProxy():
         source = spl[0]
         data = spl[1]
 
+        # Remove all instances of \ to avoid issue with ANSI escape codes
+        data = data.replace('\\', '')
+
         # search chat_list for the id corresponding to this connection
         for i,val in self.chat_list.items():
             if val[0] == conn:
                 addr = val[1]
         
-        return spl[1]
+
+        
+        return data
 
     def send_data(self, user, data):
 
